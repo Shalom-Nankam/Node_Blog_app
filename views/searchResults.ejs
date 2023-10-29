@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=, initial-scale=1.0" />
+    <title>Search Results</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background-color: bisque;
+        margin-block: 50px;
+        margin-inline: 100px;
+      }
+      h2 {
+        font-weight: bold;
+        color: blue;
+      }
+      .blog-info {
+        width: 60%;
+      }
+
+      .blog-time input {
+        border: none;
+        background-color: transparent;
+        color: blue;
+        font-weight: bold;
+      }
+      .blog-container img {
+        height: 40px;
+        width: 40px;
+        border-radius: 50%;
+        margin-right: 10px;
+      }
+      .blog-container {
+        padding: 40px 30px;
+        margin: 30px auto;
+        display: flex;
+        width: 75%;
+        align-items: flex-start;
+        justify-content: start;
+        background-color: whitesmoke;
+      }
+      .blog-time {
+        display: flex;
+        justify-content: space-between;
+      }
+      .tags {
+        display: flex;
+        justify-content: flex-start;
+        margin-top: 20px;
+        margin-bottom: 20px;
+      }
+
+      .order-section {
+        display: flex;
+        align-items: center;
+        margin-block: 20px;
+      }
+      #order {
+        margin-inline: 10px;
+        height: 30px;
+      }
+
+      #filter {
+        margin-inline: 10px;
+        height: 30px;
+      }
+
+      .tags p {
+        margin-right: 10px;
+        color: blue;
+      }
+      .body-nav {
+        margin: 40px;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .body-nav-item input {
+        font-size: 20px;
+        color: blue;
+        background-color: transparent;
+        border: none;
+      }
+
+      #filter-btn {
+        margin-inline: 50px;
+        width: 150px;
+        height: 40px;
+        border: none;
+        background-color: burlywood;
+        color: black;
+      }
+      h3 {
+        font-size: 30px;
+        font-weight: bold;
+        margin-block: 10px;
+      }
+      h6 {
+        font-size: 20px;
+        font-weight: 400;
+        margin-block: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Search Results for "<%= query.search %>"</h2>
+    <div class="order-section">
+      <form id="search-form" action="/views/blogs/search" method="post">
+        <input type="hidden" name="search" value="<%= query.search %>" />
+        <label for="sorter"> Sort by:</label>
+        <select name="sorter" id="order">
+          <option value="read_count">Read count</option>
+          <option value="reading_time">Reading time</option>
+          <option value="created_at">Timestamp</option>
+        </select>
+
+        <label for="order"> Order by:</label>
+        <select name="order" id="order">
+          <option value="asc">Ascending</option>
+          <option value="desc">Descending</option>
+        </select>
+
+        <%if (is_user_blogs) { %>
+        <label for="filter">Status:</label>
+        <select name="filter" id="filter">
+          <option value="All">All</option>
+          <option value="Draft">Drafts</option>
+          <option value="Published">Published</option>
+        </select>
+
+        <input type="hidden" value="true" name="isUser" />
+        <% } %>
+
+        <input type="submit" value="Filter results" id="filter-btn" />
+      </form>
+    </div>
+    <% if (data) { %> <% for (var i = 0; i < data.blogs.length; i++) { %>
+    <form action="/views/blogs/fetch" method="get">
+      <input type="hidden" name="id" value="<%= data.blogs[i]._id %>" />
+      <div class="blog-container">
+        <img src="/profile.jpeg" alt="Image of an avatar" srcset="" />
+        <div class="blog-info">
+          <h4 id="author-name">
+            <%= data.blogs[i].author.first_name %> <%=
+            data.blogs[i].author.last_name %>
+          </h4>
+          <p><%= data.blogs[i].formatDate() %></p>
+          <div class="blog-headers">
+            <h3><%=data.blogs[i].title %></h3>
+            <h6><%=data.blogs[i].description %></h6>
+            <div class="tags">
+              <% for (var j =0; j< data.blogs[i].tags.length; j++) { %>
+              <p><%= data.blogs[i].tags[j] %></p>
+              <% } %>
+            </div>
+            <div class="blog-time">
+              <p id="read-time"><%= data.blogs[i].reading_time %> min read</p>
+              <input type="submit" value="Read more" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+    <% } %> <% } %>
+
+    <div class="body-nav">
+      <% if (data.hasPrevPage) { %>
+      <form action="/views/blogs/search" method="post">
+        <div class="body-nav-item" style="display: flex; align-items: center">
+          <input type="hidden" name="page" value="<%= data.prevPage %>" />
+          <input type="hidden" name="search" value="<%= query.search %>" />
+          <input type="hidden" name="sorter" value="<%= query.sorter %>" />
+          <input type="hidden" name="order" value="<%= query.order %>" />
+          <input type="hidden" name="filter" value="<%= query.filter %>" />
+          <i
+            class="material-icons"
+            style="font-size: 30px; color: blue; padding-right: 10px"
+            >arrow_back</i
+          >
+          <input type="submit" value="Prev page" />
+        </div>
+      </form>
+      <% } else { %>
+      <div class="body-nav-item"></div>
+      <% } %> <% if (data.hasNextPage) { %>
+      <form action="/views/blogs/search" method="post">
+        <div class="body-nav-item" style="display: flex; align-items: center">
+          <input type="hidden" name="page" value="<%= data.nextPage %>" />
+          <input type="hidden" name="search" value="<%= query.search %>" />
+          <input type="hidden" name="sorter" value="<%= query.sorter %>" />
+          <input type="hidden" name="order" value="<%= query.order %>" />
+          <input type="hidden" name="filter" value="<%= query.filter %>" />
+          <input type="submit" value="Next page" />
+          <i
+            class="material-icons"
+            style="font-size: 30px; color: blue; padding-right: 10px"
+            >arrow_forward</i
+          >
+        </div>
+      </form>
+      <% } else { %>
+      <div class="body-nav-item"></div>
+      <% } %>
+    </div>
+  </body>
+</html>

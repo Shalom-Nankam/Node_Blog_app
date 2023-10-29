@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    />
+    <title>Blog</title>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background-color: bisque;
+      }
+
+      .wrapper {
+        margin: 50px 100px;
+      }
+      img {
+        height: 40px;
+        width: 40px;
+        border-radius: 50%;
+        margin-right: 20px;
+      }
+      .author-section {
+        display: flex;
+      }
+      h2 {
+        text-align: center;
+        font-size: 30px;
+        margin-block: 30px;
+      }
+      .tags {
+        display: flex;
+        justify-content: flex-start;
+        margin-top: 20px;
+        margin-bottom: 20px;
+      }
+
+      .tags p {
+        margin-right: 10px;
+        color: blue;
+      }
+      .description {
+        font-weight: bold;
+      }
+      input {
+        height: 50px;
+        width: 200px;
+        border-radius: 14px;
+        border: none;
+        margin-block: 50px;
+        margin-inline: 20px;
+      }
+      #post-btn {
+        background-color: blue;
+        color: white;
+      }
+
+      #del-btn {
+        background-color: white;
+        color: black;
+      }
+      .action-btns {
+        justify-content: center;
+        display: flex;
+      }
+      .more-info {
+        display: flex;
+        align-items: center;
+        margin-block: 30px;
+      }
+      #read-time {
+        margin-right: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <% if (blog) { %>
+    <div class="wrapper">
+      <div class="author-section">
+        <img src="/profile.jpeg" alt="User profile avatar" srcset="" />
+        <div class="author-info">
+          <h3><%= blog.author.first_name%> <%=blog.author.last_name%></h3>
+          <p>Posted on <%= blog.formatDate() %></p>
+        </div>
+      </div>
+      <div class="more-info">
+        <p id="read-time"><%= blog.reading_time %> min read</p>
+        <i
+          class="material-icons"
+          style="font-size: 20px; color: black; padding-right: 10px"
+          >visibility</i
+        >
+        <p><%= blog.read_count %></p>
+      </div>
+      <h2><%= blog.title %></h2>
+      <p class="description"><%= blog.description %></p>
+      <div class="tags">
+        <% for (var i =0; i< blog.tags.length; i++) { %>
+        <p><%= blog.tags[i] %></p>
+        <% } %>
+      </div>
+      <p class="body"><%= blog.body %></p>
+
+      <% if (is_author) { %>
+      <form action="/views/blogs/edit" method="get">
+        <div class="action-btns">
+          <input type="hidden" name="id" value="<%= blog._id %>" />
+          <input type="submit" value="Edit post" id="post-btn" />
+          <input
+            type="submit"
+            value="Delete post"
+            id="del-btn"
+            formaction="/views/blogs/delete"
+            formmethod="post"
+          />
+        </div>
+      </form>
+      <% } %>
+    </div>
+    <% } %>
+  </body>
+</html>

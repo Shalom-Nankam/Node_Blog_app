@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        margin: 0;
+        background-color: bisque;
+      }
+      h1 {
+        font-size: 50px;
+      }
+      span {
+        color: red;
+      }
+      .header {
+        display: flex;
+        width: 1440px;
+        height: 100px;
+      }
+      nav {
+        display: flex;
+        position: fixed;
+        z-index: 100;
+        transition: all 500ms ease;
+        margin-bottom: 10px;
+        padding: 10px 30px;
+        top: 0;
+        width: 100%;
+        justify-content: space-between;
+        align-items: center;
+        background-color: burlywood;
+      }
+      .header-btns {
+        display: flex;
+        align-items: end;
+      }
+      .header-btns input {
+        width: 150px;
+        height: 50px;
+        border-radius: 12px;
+        margin-right: 10px;
+        border: none;
+      }
+      #h-btn-first {
+        background-color: white;
+        color: black;
+      }
+      #h-btn-second {
+        background-color: blue;
+        color: white;
+      }
+      #h-btn-third {
+        border-radius: 0px;
+        background-color: transparent;
+        color: blue;
+        font-weight: 900;
+        font-size: 20px;
+      }
+      #search-form {
+        width: 70%;
+        display: flex;
+        margin: 20px auto;
+        justify-content: center;
+      }
+      #search-field {
+        width: 60%;
+        height: 40px;
+        margin-right: 10px;
+        outline-color: burlywood;
+      }
+
+      #search-btn {
+        width: 150px;
+        background-color: burlywood;
+        border: none;
+        margin-right: 20px;
+      }
+      .search-section {
+        height: 60px;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+      }
+      .order-section {
+        display: flex;
+        align-items: center;
+      }
+      #order {
+        margin-inline: 10px;
+        height: 30px;
+      }
+      .blog-container img {
+        height: 40px;
+        width: 40px;
+        border-radius: 50%;
+        margin-right: 10px;
+      }
+      .blog-container {
+        padding: 40px 30px;
+        margin: 30px auto;
+        display: flex;
+        width: 75%;
+        align-items: flex-start;
+        justify-content: start;
+        background-color: whitesmoke;
+      }
+      .blog-time {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .blog-headers {
+        margin-top: 20px;
+      }
+
+      .tags {
+        display: flex;
+        justify-content: flex-start;
+        margin-top: 20px;
+        margin-bottom: 20px;
+      }
+
+      .tags p {
+        margin-right: 10px;
+        color: blue;
+      }
+
+      .blog-info {
+        width: 60%;
+      }
+
+      .blog-time input {
+        border: none;
+        background-color: transparent;
+        color: blue;
+        font-weight: bold;
+      }
+      h3 {
+        font-size: 30px;
+        font-weight: bold;
+        margin-block: 10px;
+      }
+      h6 {
+        font-size: 20px;
+        font-weight: 400;
+        margin-block: 10px;
+      }
+      .body-nav {
+        margin: 40px;
+        display: flex;
+        justify-content: space-between;
+      }
+      .body-nav-item input {
+        font-size: 20px;
+        color: blue;
+        background-color: transparent;
+        border: none;
+      }
+      .h-btns {
+        display: flex;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <nav>
+        <header>
+          <h1>blog.<span>io</span></h1>
+        </header>
+
+        <div class="header-btns">
+          <form action="/views/login" method="get">
+            <div class="h-btns">
+              <% if (user) { %>
+              <input
+                id="h-btn-third"
+                type="submit"
+                value="Your blogs"
+                formaction="/views/blogs/user"
+                formmethod="get"
+              />
+
+              <input
+                id="h-btn-first"
+                type="submit"
+                value="Create blog"
+                formaction="/views/blogs/create"
+                formmethod="get"
+              />
+              <input
+                id="h-btn-second"
+                type="submit"
+                value="Log out"
+                formaction="/views/logout"
+                formmethod="get"
+              />
+              <% } else { %>
+              <input id="h-btn-first" type="submit" value="Log in" />
+              <input
+                id="h-btn-second"
+                type="submit"
+                value="Sign up"
+                formaction="/views/signup"
+                formmethod="get"
+              />
+              <% } %>
+            </div>
+          </form>
+        </div>
+      </nav>
+    </div>
+    <div class="search-section">
+      <form id="search-form" action="/views/blogs/search" method="post">
+        <input
+          id="search-field"
+          type="search"
+          value=""
+          name="search"
+          placeholder="Search title, tags"
+        />
+        <input id="search-btn" type="submit" value="Search" />
+      </form>
+    </div>
+
+    <% if (data) { %> <% for (var i = 0; i < data.blogs.length; i++) { %>
+    <form action="/views/blogs/fetch" method="get">
+      <input type="hidden" name="id" value="<%= data.blogs[i]._id %>" />
+      <div class="blog-container">
+        <img src="/profile.jpeg" alt="Image of an avatar" srcset="" />
+        <div class="blog-info">
+          <h4 id="author-name">
+            <%= data.blogs[i].author.first_name %> <%=
+            data.blogs[i].author.last_name %>
+          </h4>
+          <p><%= data.blogs[i].formatDate() %></p>
+          <div class="blog-headers">
+            <h3><%=data.blogs[i].title %></h3>
+            <h6><%=data.blogs[i].description %></h6>
+            <div class="tags">
+              <% for (var j =0; j< data.blogs[i].tags.length; j++) { %>
+              <p><%= data.blogs[i].tags[j] %></p>
+              <% } %>
+            </div>
+            <div class="blog-time">
+              <p id="read-time"><%= data.blogs[i].reading_time %> min read</p>
+              <input type="submit" value="Read more" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+    <% } %> <% } %>
+
+    <div class="body-nav">
+      <% if (data.hasPrevPage) { %>
+      <form action="/views/home" method="get">
+        <div class="body-nav-item" style="display: flex; align-items: center">
+          <input type="hidden" name="page" value="<%= data.nextPage %>" />
+          <i
+            class="material-icons"
+            style="font-size: 30px; color: blue; padding-right: 10px"
+            >arrow_back</i
+          >
+          <input type="submit" value="Prev page" />
+        </div>
+      </form>
+      <% } else { %>
+      <div class="body-nav-item"></div>
+      <% } %> <% if (data.hasNextPage) { %>
+      <form action="/views/home/" method="get">
+        <div class="body-nav-item" style="display: flex; align-items: center">
+          <input type="hidden" name="page" value="<%= data.nextPage %>" />
+          <input type="submit" value="Next page" />
+          <i
+            class="material-icons"
+            style="font-size: 30px; color: blue; padding-right: 10px"
+            >arrow_forward</i
+          >
+        </div>
+      </form>
+      <% } else { %>
+      <div class="body-nav-item"></div>
+      <% } %>
+    </div>
+  </body>
+</html>

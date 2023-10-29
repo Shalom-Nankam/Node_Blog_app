@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register</title>
+    <style>
+      body {
+        background-color: burlywood;
+      }
+      .form-section {
+        margin: 8% auto;
+        height: 500px;
+        width: 700px;
+        display: flex;
+      }
+
+      img {
+        height: 100%;
+        width: 100%;
+        object-fit: cover;
+      }
+      .left {
+        width: 50%;
+        background-image: url("/signup.jpeg");
+        height: 100%;
+      }
+      .right-section {
+        width: 50%;
+        height: 100%;
+        background-color: white;
+      }
+      .right {
+        height: 80%;
+        width: 100%;
+        display: flex;
+      }
+      .right-bottom {
+        display: flex;
+      }
+      form {
+        margin: auto;
+      }
+      h3 {
+        text-align: center;
+        font-size: 30px;
+      }
+      input {
+        margin-top: 10px;
+        margin-bottom: 10px;
+      }
+      #btn {
+        width: 100%;
+        height: 30px;
+        background-color: burlywood;
+        color: black;
+        border: 1px none;
+        border-radius: 10px;
+      }
+      .btn2 {
+        background-color: transparent;
+        border: none;
+      }
+      #second {
+        color: blue;
+      }
+      .error {
+        color: red;
+        font-size: 16px;
+        font-weight: bold;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="form-section">
+      <div class="left">
+        <img src="/signup.jpeg" alt="Image of a man on a phone" srcset="" />
+      </div>
+      <div class="right-section">
+        <div class="right">
+          <form action="/views/signup" method="post">
+            <h3>Sign up</h3>
+            <label for="first_name">First Name:</label><br />
+            <input
+              type="text"
+              name="first_name"
+              id="first_name"
+              value=""
+              autocomplete="given-name"
+              required
+            />
+            <br />
+            <label for="last_name">Last Name:</label><br />
+            <input
+              type="text"
+              name="last_name"
+              id="last_name"
+              value=""
+              autocomplete="family-name"
+              required
+            />
+            <br />
+            <label for="email">Email:</label><br />
+            <input
+              type="email"
+              name="email"
+              id="email"
+              value=""
+              autocomplete="email"
+              required
+            />
+            <br />
+            <label for="password">Password:</label><br />
+            <input
+              type="password"
+              name="password"
+              id="password"
+              value=""
+              autocomplete="off"
+              required
+            />
+            <br />
+
+            <input id="btn" type="submit" value="Sign up" />
+          </form>
+        </div>
+        <div class="right-bottom">
+          <form action="/views/login" method="get">
+            <span>Already have an account?</span>
+            <input id="second" class="btn2" type="submit" value="Sign in" />
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <% if (error) { %>
+    <p class="error"><%= error %></p>
+    <% } %>
+  </body>
+</html>

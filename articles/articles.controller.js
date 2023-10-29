@@ -1,8 +1,9 @@
 const ArticleModel = require("./article.model");
 const logger = require("../config/logger");
 
-const CreateBlog = async (blog) => {
+const CreateBlog = async (req, res) => {
   logger.info("=====================> creating new blog ");
+  const blog = req.body;
   try {
     const existingblog = await ArticleModel.findOne({
       title: blog.title,
@@ -14,11 +15,11 @@ const CreateBlog = async (blog) => {
     if (existingblog) {
       logger.info("=====================> blog already exists");
 
-      return {
+      return res.status(409).json({
         message: "Blog already exists.",
         data: null,
-        code: 409,
-      };
+      });
+      s;
     }
 
     const createdBlog = await ArticleModel.create({
@@ -30,55 +31,51 @@ const CreateBlog = async (blog) => {
       description: blog.description,
     });
     logger.info("==================> Created blog successfully");
-    return {
+    return res.status(201).json({
       message: "Blog created successfully",
       data: createdBlog,
-      code: 201,
-    };
+    });
   } catch (error) {
     logger.error("===============> error in creating blog" + error.message);
-    return {
+    return res.status(500).json({
       message: "Internal server error",
       data: null,
-      code: 500,
-    };
+    });
   }
 };
 
-const GetBlogs = async (page, id, blogState) => {
-  logger.info("===============> getting all blogs for user: " + id);
+const GetBlogs = async (req, res) => {
+  logger.info("===============> getting all blogs");
+
+  const blogDetails = req.body;
 
   const queryOptions = {};
-  if (id) {
-    queryOptions.author = id;
+  if (blogDetails.user_id) {
+    queryOptions.author = blogDetails.user_id;
   }
-  if (blogState) {
-    queryOptions.state = blogState;
+  if (blogDetails.blog_state) {
+    queryOptions.state = blogDetails.blog_state;
   }
 
   try {
     const blogs = await ArticleModel.paginate(queryOptions, {
-      page: page ? page : 1,
+      page: blogDetails.page ? blogDetails.page : 1,
       limit: 20,
       populate: "author",
     });
 
     if (!blogs) {
-      logger.info("===============> did not find blogs for user" + id);
-      return {
-        message: "Did not find any blog for this user",
-        data: blogs,
-        code: 201,
-      };
+      logger.info("===============> did not find blogs for user");
+      return res.status(200).json({
+        message: "No blogs found",
+        data: null,
+      });
     }
 
     logger.info("===============> succesfully fetched blogs");
 
-    console.log({ blogs });
-
-    return {
+    return res.status(200).json({
       message: "Blogs fetched successfully",
-      code: 200,
       data: {
         blogs: blogs.docs,
         hasNextPage: blogs.hasNextPage,
@@ -86,63 +83,60 @@ const GetBlogs = async (page, id, blogState) => {
         hasPrevPage: blogs.hasPrevPage,
         prevPage: blogs.prevPage,
       },
-    };
+    });
   } catch (error) {
     logger.error(
       "==================> error with getting blogs " + error.message
     );
-    return {
-      message: "An error occured",
-      code: 500,
+    return res.status(500).json({
+      message: error.message,
       data: null,
-    };
+    });
   }
 };
 
-const UpdateBlog = async (blog) => {
-  logger.info("==================> updating blog: " + blog._id);
-  console.log({ blog });
+const UpdateBlog = async (req, res) => {
+  const blogInfo = req.body;
+  logger.info("==================> updating blog: " + blogInfo._id);
   try {
     const updateBlog = await ArticleModel.findByIdAndUpdate(
-      blog._id,
+      blogInfo._id,
       {
-        state: blog.state,
-        description: blog.description,
-        title: blog.title,
-        tags: blog.tags,
-        body: blog.body,
+        state: blogInfo.state,
+        description: blogInfo.description,
+        title: blogInfo.title,
+        tags: blogInfo.tags,
+        body: blogInfo.body,
       },
       {
         returnDocument: "after",
       }
     );
     if (!updateBlog) {
-      logger.info("==================> error finding blog: " + blog._id);
+      logger.info("==================> error finding blog: " + blogInfo._id);
 
-      return {
+      return res.status(404).json({
         message: "Could not find blog to update",
-        code: 404,
         data: null,
-      };
+      });
     }
-    logger.info("==================> updated blog: " + blog._id);
+    logger.info("==================> updated blog: " + blogInfo._id);
 
-    return {
+    return res.status(201).json({
       message: "Blog successfully updated",
-      code: 201,
       data: updateBlog,
-    };
+    });
   } catch (error) {
     logger.error("==================> error updating blog: " + error.message);
-    return {
-      code: 500,
+    return res.status(500).json({
       message: error.message,
       data: null,
-    };
+    });
   }
 };
 
-const DeleteBlog = async (id, userId) => {
+const DeleteBlog = async (req, res) => {
+  const id = req.body.blog_id;
   logger.info("===============> deleting blog :" + id);
 
   try {
@@ -153,94 +147,82 @@ const DeleteBlog = async (id, userId) => {
     if (!deletedBlog) {
       logger.info("===============> could not find or delete blog");
 
-      return {
+      return res.status(422).json({
         message: "Could not delete blog",
         data: null,
-        code: 500,
-      };
+      });
     }
 
     logger.info("===============> succesfully deleted blog");
 
-    const isAuthor = deletedBlog.author._id === userId;
-
-    return {
+    return res.status(200).json({
       message: "Blog successfully deleted",
-      code: 201,
       data: deletedBlog,
-      is_author: isAuthor,
-    };
+    });
   } catch (error) {
     logger.error(
       "==================> error with deleting blog" + error.message
     );
-    return {
-      message: "An error occured",
-      code: 500,
+    return res.status(500).json({
+      message: error.message,
       data: null,
-    };
+    });
   }
 };
 
-const GetSingleBlog = async (id, userId) => {
-  logger.info("===================> Getting single blog:" + id);
+const GetSingleBlog = async (req, res) => {
+  const blogInfo = req.body;
+  logger.info("===================> Getting single blog:" + blogInfo.blog_id);
 
   try {
-    const blog = await ArticleModel.findById(id).populate("author").exec();
+    const blog = await ArticleModel.findById(blogInfo.blog_id)
+      .populate("author")
+      .exec();
     if (!blog) {
-      logger.info("================> error getting single blog: " + id);
-      return {
-        code: 404,
+      logger.info(
+        "================> error getting single blog: " + blogInfo.blog_id
+      );
+      return res.status(404).json({
         message: "Could not find blog",
         data: null,
-      };
+      });
     }
-    const isAuthor = blog.author._id === userId;
-    logger.info("================> retrieved blog successfully: " + id);
-    return {
-      code: 200,
+    logger.info("================> retrieved blog successfully: ");
+    return res.status(200).json({
       message: "Blog retrieved successfully",
       data: blog,
-      is_author: isAuthor,
-    };
+    });
   } catch (error) {
     logger.error(
       "================> error getting single blog: " + error.message
     );
-    return {
-      code: 500,
-      message: "An error occured",
+    return res.status(500).json({
+      message: error.message,
       data: null,
-    };
+    });
   }
 };
 
-const SearchBlogs = async (
-  page,
-  searchTerm,
-  filter,
-  sorter,
-  order,
-  isUser,
-  userId
-) => {
-  logger.info("==============> searching blogs for " + searchTerm);
-  let regex = new RegExp(searchTerm, "i");
+const SearchBlogs = async (req, res) => {
+  const queryParams = req.body;
+  logger.info("==============> searching blogs for " + queryParams.search_term);
+  let regex = new RegExp(queryParams.search_term, "i");
   const queryOptions = {
     $or: [{ title: regex }, { tags: regex }],
   };
-  if (filter && filter != "All") {
-    queryOptions.state = filter;
+  if (queryParams.filter && queryParams.filter != "All") {
+    queryOptions.state = queryParams.filter;
   }
-  if (isUser) {
-    queryOptions.author = userId;
+  if (queryParams.is_user_blogs === "true") {
+    queryOptions.author = queryParams.user_id;
   }
   console.log({ queryOptions });
 
-  console.log({ sorter, order });
+  const sorter = queryParams.sorter;
+  const order = queryParams.order;
 
   const matches = await ArticleModel.paginate(queryOptions, {
-    page: page ? page : 1,
+    page: queryParams.page ? page : 1,
     limit: 20,
     populate: "author",
     sort: sorter ? { sorter: order } : {},
@@ -250,8 +232,7 @@ const SearchBlogs = async (
 
   console.log({ matches });
 
-  return {
-    code: 200,
+  return res.status(200).json({
     data: {
       blogs: matches.docs,
       hasNextPage: matches.hasNextPage,
@@ -259,8 +240,8 @@ const SearchBlogs = async (
       hasPrevPage: matches.hasPrevPage,
       prevPage: matches.prevPage,
     },
-    message: "Blogs search successfully",
-  };
+    message: "Blogs searched successfully",
+  });
 };
 
 module.exports = {

@@ -4,7 +4,7 @@ const logger = require("./logger");
 require("dotenv").config();
 
 const connect = async () => {
-  await mongoose.connect(process.env.MONGO_DB_URL);
+  mongoose.connect(process.env.MONGO_DB_URL);
 
   mongoose.connection.on("connected", () => {
     logger.info("Database connected successfully");

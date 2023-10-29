@@ -172,6 +172,7 @@ router.get("/blogs/user", async (req, res) => {
 
 router.post("/blogs/search", async (req, res) => {
   const queryParams = req.body;
+  const user_id = res.locals.user ? res.locals.user._id : null;
 
   console.log({ queryParams });
 
@@ -184,7 +185,7 @@ router.post("/blogs/search", async (req, res) => {
     queryParams.sorter,
     queryParams.order,
     isUserBlogs,
-    res.locals.user._id
+    user_id
   );
 
   if (matchingBlogs.code === 200) {

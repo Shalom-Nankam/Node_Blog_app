@@ -16,8 +16,6 @@ app.use(express.static("views"));
 
 app.set("view engine", "ejs");
 
-app.use("/", viewsRouter);
-
 app.use("/views", viewsRouter);
 
 db.connect();

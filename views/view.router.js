@@ -10,10 +10,6 @@ const router = express.Router();
 
 router.use(cookieParser());
 
-router.get("/", (req, res) => {
-  res.redirect("/views/home");
-});
-
 router.get("/signup", (req, res) => {
   res.render("signup", { error: null });
 });
